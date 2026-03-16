@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "packageManager": "pnpm@9.4.0",
   "scripts": {
-    "dev": "pnpm --parallel --filter app-shell --filter loan-mfe --filter onboarding-mfe dev",
+    "dev": "concurrently -k -n host,loan,onboarding -c blue,green,magenta \"pnpm --filter app-shell dev\" \"pnpm --filter loan-mfe dev:remote\" \"pnpm --filter onboarding-mfe dev:remote\"",
     "build": "pnpm -r build",
     "preview": "pnpm --parallel --filter app-shell --filter loan-mfe --filter onboarding-mfe preview"
   },
@@ -15,6 +15,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.4.27",
+    "concurrently": "^9.2.1",
     "postcss": "^8.5.8",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

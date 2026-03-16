@@ -49,7 +49,7 @@ pnpm install
 pnpm dev
 ```
 
-`pnpm dev` starts all three apps in parallel.
+`pnpm dev` starts the host with Vite dev and serves both remotes from built `dist` output in watch mode. This is necessary because the federation plugin does not expose `remoteEntry.js` from Vite remote dev servers.
 
 ## Build
 

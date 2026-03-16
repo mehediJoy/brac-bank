@@ -3,8 +3,29 @@ import { Button, CameraPreview, Card, FileUploader, Input, Stepper } from "@bank
 import { useBankingStore } from "@banking/store";
 
 const steps = ["Personal info", "Address info", "Income info", "Review"];
+const remoteCssKey = "css__onboarding-mfe__./App";
+
+function useRemoteStyles() {
+  useEffect(() => {
+    const hrefs = (window as Window & { [remoteCssKey]?: string[] })[remoteCssKey];
+    if (!Array.isArray(hrefs)) return;
+
+    hrefs.forEach((href) => {
+      if (document.head.querySelector(`link[data-remote-style="${href}"]`)) {
+        return;
+      }
+
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = href;
+      link.dataset.remoteStyle = href;
+      document.head.appendChild(link);
+    });
+  }, []);
+}
 
 export default function App() {
+  useRemoteStyles();
   const { userProfile, onboardingProgress, updateUserProfile, updateOnboardingProgress } =
     useBankingStore();
   const [errors, setErrors] = useState<Record<string, string>>({});

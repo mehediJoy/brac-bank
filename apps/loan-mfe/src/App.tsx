@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button, Card, Input, Stepper } from "@banking/ui";
 import { type LoanProduct, useBankingStore } from "@banking/store";
 import products from "./data/loanProducts.json";
@@ -11,7 +11,29 @@ const money = new Intl.NumberFormat("en-BD", {
   maximumFractionDigits: 0
 });
 
+const remoteCssKey = "css__loan-mfe__./App";
+
+function useRemoteStyles() {
+  useEffect(() => {
+    const hrefs = (window as Window & { [remoteCssKey]?: string[] })[remoteCssKey];
+    if (!Array.isArray(hrefs)) return;
+
+    hrefs.forEach((href) => {
+      if (document.head.querySelector(`link[data-remote-style="${href}"]`)) {
+        return;
+      }
+
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = href;
+      link.dataset.remoteStyle = href;
+      document.head.appendChild(link);
+    });
+  }, []);
+}
+
 export default function App() {
+  useRemoteStyles();
   const { userProfile, loanApplication, setSelectedLoan, updateLoanApplication, updateUserProfile } =
     useBankingStore();
   const [step, setStep] = useState(loanApplication.submitted ? 3 : loanApplication.selectedLoan ? 2 : 1);

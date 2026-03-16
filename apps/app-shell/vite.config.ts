@@ -15,6 +15,10 @@ export default defineConfig({
       shared: ["react", "react-dom", "zustand"]
     })
   ],
+  server: {
+    port: 3000,
+    strictPort: true
+  },
   resolve: {
     alias: {
       "@banking/ui": fileURLToPath(new URL("../../packages/ui-library/src", import.meta.url)),
