@@ -17,7 +17,21 @@ export type UserProfile = {
 export type OnboardingProgress = {
   step: number;
   nidFrontName: string;
+  nidFrontImage: string | null;
+  nidFrontMeta: {
+    type: string;
+    sizeKb: number;
+    width: number;
+    height: number;
+  } | null;
   nidBackName: string;
+  nidBackImage: string | null;
+  nidBackMeta: {
+    type: string;
+    sizeKb: number;
+    width: number;
+    height: number;
+  } | null;
   livenessVerified: boolean;
   livenessStatus: "idle" | "captured" | "verifying" | "verified";
   livenessImage: string | null;
@@ -66,7 +80,11 @@ const initialUserProfile: UserProfile = {
 const initialOnboardingProgress: OnboardingProgress = {
   step: 1,
   nidFrontName: "",
+  nidFrontImage: null,
+  nidFrontMeta: null,
   nidBackName: "",
+  nidBackImage: null,
+  nidBackMeta: null,
   livenessVerified: false,
   livenessStatus: "idle",
   livenessImage: null,

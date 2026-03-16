@@ -5,6 +5,41 @@ import { useBankingStore } from "@banking/store";
 const steps = ["Personal info", "Address info", "Income info", "Review"];
 const remoteCssKey = "css__onboarding-mfe__./App";
 
+function readImageMetadata(file: File): Promise<{
+  preview: string;
+  meta: { type: string; sizeKb: number; width: number; height: number };
+}> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      const preview = String(reader.result ?? "");
+      if (!preview) {
+        reject(new Error("Unable to read image file"));
+        return;
+      }
+
+      const image = new Image();
+      image.onload = () => {
+        resolve({
+          preview,
+          meta: {
+            type: file.type,
+            sizeKb: file.size / 1024,
+            width: image.naturalWidth,
+            height: image.naturalHeight
+          }
+        });
+      };
+      image.onerror = () => reject(new Error("Unable to read image dimensions"));
+      image.src = preview;
+    };
+
+    reader.onerror = () => reject(new Error("Unable to read image file"));
+    reader.readAsDataURL(file);
+  });
+}
+
 function useRemoteStyles() {
   useEffect(() => {
     const hrefs = (window as Window & { [remoteCssKey]?: string[] })[remoteCssKey];
@@ -187,13 +222,51 @@ export default function App() {
                 label="NID Front"
                 helperText="Upload the front side of the NID."
                 fileName={onboardingProgress.nidFrontName}
-                onFileSelect={(file) => updateOnboardingProgress({ nidFrontName: file?.name ?? "" })}
+                imagePreview={onboardingProgress.nidFrontImage}
+                imageMeta={onboardingProgress.nidFrontMeta}
+                onFileSelect={(file) => {
+                  if (!file) {
+                    updateOnboardingProgress({
+                      nidFrontName: "",
+                      nidFrontImage: null,
+                      nidFrontMeta: null
+                    });
+                    return;
+                  }
+
+                  void readImageMetadata(file).then(({ preview, meta }) => {
+                    updateOnboardingProgress({
+                      nidFrontName: file.name,
+                      nidFrontImage: preview,
+                      nidFrontMeta: meta
+                    });
+                  });
+                }}
               />
               <FileUploader
                 label="NID Back"
                 helperText="Upload the back side of the NID."
                 fileName={onboardingProgress.nidBackName}
-                onFileSelect={(file) => updateOnboardingProgress({ nidBackName: file?.name ?? "" })}
+                imagePreview={onboardingProgress.nidBackImage}
+                imageMeta={onboardingProgress.nidBackMeta}
+                onFileSelect={(file) => {
+                  if (!file) {
+                    updateOnboardingProgress({
+                      nidBackName: "",
+                      nidBackImage: null,
+                      nidBackMeta: null
+                    });
+                    return;
+                  }
+
+                  void readImageMetadata(file).then(({ preview, meta }) => {
+                    updateOnboardingProgress({
+                      nidBackName: file.name,
+                      nidBackImage: preview,
+                      nidBackMeta: meta
+                    });
+                  });
+                }}
               />
             </div>
 
