@@ -11,3 +11,9 @@ body {
 a {
   text-decoration: none;
 }
+
+@media (max-width: 767px) {
+  .mobile-nav-hidden {
+    display: none !important;
+  }
+}

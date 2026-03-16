@@ -107,17 +107,31 @@ function Dashboard() {
 }
 
 export default function App() {
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
   return (
     <div className="min-h-screen bg-gray-100 font-body text-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-6 md:px-6">
-        <header className="mb-8 flex flex-col gap-4 rounded-[28px] bg-white px-6 py-5 shadow-card md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">
+        <header className="mb-8 flex flex-col gap-4 rounded-[28px] bg-white px-6 py-5 shadow-card md:!flex-row md:!items-center md:!justify-between">
+          <div className="flex w-full md:w-auto items-center justify-between pointer-events-auto">
+            <p className="text-base font-bold uppercase tracking-[0.22em] text-blue-600 md:text-lg">
               BRAC Bank
             </p>
-            <h1 className="font-display text-2xl font-semibold">React micro-frontend workspace</h1>
+            <button
+              className="md:hidden rounded-lg p-2 text-slate-600 hover:bg-slate-100"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                {isMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </div>
-          <nav className="flex flex-wrap gap-3 text-sm font-medium">
+          <nav className={`flex ${isMenuOpen ? "flex-col" : "mobile-nav-hidden"} w-full md:w-auto gap-3 text-sm font-medium md:!flex md:!flex-row md:items-center md:justify-end`}>
             {[
               ["/", "Dashboard"],
               ["/onboarding", "Onboarding"],
@@ -126,8 +140,11 @@ export default function App() {
               <NavLink
                 key={to}
                 to={to}
+                onClick={() => setIsMenuOpen(false)}
                 className={({ isActive }) =>
-                  `rounded-xl px-4 py-2 ${isActive ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700"}`
+                  `rounded-xl px-4 py-2 text-center ${
+                    isActive ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  }`
                 }
                 end={to === "/"}
               >
