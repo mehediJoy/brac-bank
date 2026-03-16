@@ -3,6 +3,17 @@ import react from "@vitejs/plugin-react";
 import federation from "@originjs/vite-plugin-federation";
 import { fileURLToPath, URL } from "node:url";
 
+/**
+ * Workaround for a known bug in @originjs/vite-plugin-federation.
+ *
+ * The plugin injects a `__v__css__<path>` *string* placeholder into
+ * remoteEntry.js, but` dynamicLoadingCss()` calls `.forEach()` on it,
+ * which crashes because strings don't have that method.
+ *
+ * This post-build plugin scans the final bundle for every CSS asset,
+ * then replaces the broken placeholder call with a proper array so
+ * that `dynamicLoadingCss()` works correctly.
+ */
 function fixRemoteEntryCss(): Plugin {
   return {
     name: "fix-remote-entry-css",
@@ -10,10 +21,8 @@ function fixRemoteEntryCss(): Plugin {
     enforce: "post",
     generateBundle(_, bundle) {
       const cssFiles = Object.values(bundle)
-        .filter((chunk) => chunk.type === "asset")
-        .map((asset) => asset.fileName)
-        .filter((fileName) => fileName.endsWith(".css"))
-        .map((fileName) => fileName.split("/").pop() ?? fileName);
+        .filter((chunk) => chunk.type === "asset" && chunk.fileName.endsWith(".css"))
+        .map((asset) => asset.fileName.split("/").pop() ?? asset.fileName);
 
       const remoteEntry = Object.values(bundle).find(
         (chunk) => chunk.type === "chunk" && chunk.fileName.endsWith("remoteEntry.js")
@@ -21,9 +30,10 @@ function fixRemoteEntryCss(): Plugin {
 
       if (!remoteEntry || remoteEntry.type !== "chunk") return;
 
+      // Replace the broken string placeholder with a proper CSS filename array
       remoteEntry.code = remoteEntry.code.replace(
-        /a\(`__v__css__[^`]+`,!0,`\.\/*App`\)/g,
-        `a(${JSON.stringify(cssFiles)},!0,\`./App\`)`
+        /a\(`__v__css__[^`]*`,/g,
+        `a(${JSON.stringify(cssFiles)},`
       );
     }
   };
@@ -56,6 +66,7 @@ export default defineConfig({
     }
   },
   build: {
-    target: "esnext"
+    target: "esnext",
+    cssCodeSplit: false
   }
 });
