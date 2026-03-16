@@ -1,0 +1,5 @@
+[
+  { "id": "home", "name": "Home Loan", "interestRate": 8.4, "maximumAmount": 12000000 },
+  { "id": "auto", "name": "Auto Loan", "interestRate": 9.1, "maximumAmount": 4000000 },
+  { "id": "salary", "name": "Salary Loan", "interestRate": 10.2, "maximumAmount": 1500000 }
+]

@@ -1,0 +1,150 @@
+import React, { Suspense } from "react";
+import { Link, NavLink, Route, Routes } from "react-router-dom";
+import { Card, Loader } from "@banking/ui";
+import { useBankingStore } from "@banking/store";
+
+const LoanApp = React.lazy(() => import("loan-mfe/App"));
+const OnboardingApp = React.lazy(() => import("onboarding-mfe/App"));
+
+function Dashboard() {
+  const { userProfile, onboardingProgress, loanApplication } = useBankingStore();
+
+  return (
+    <div className="space-y-6">
+      <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+        <Card
+          title="Banking journeys in one workspace"
+          description="Start onboarding, apply for a loan, and track progress from the host shell."
+          className="overflow-hidden bg-slate-950 text-white"
+        >
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-4">
+              <p className="max-w-md text-sm text-slate-300">
+                This shell lazy-loads both micro-frontends and keeps applicant data centralized
+                through a shared Zustand store.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  to="/onboarding"
+                  className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white"
+                >
+                  Start onboarding
+                </Link>
+                <Link
+                  to="/loan"
+                  className="rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900"
+                >
+                  Explore loans
+                </Link>
+              </div>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Applicant snapshot</p>
+              <dl className="mt-4 grid gap-3 text-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-400">Name</dt>
+                  <dd className="font-medium">{userProfile.fullName || "Not started"}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-400">Onboarding</dt>
+                  <dd className="font-medium">
+                    {onboardingProgress.submitted ? "Submitted" : `Step ${onboardingProgress.step}/4`}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-400">Loan</dt>
+                  <dd className="font-medium">
+                    {loanApplication.selectedLoan?.name || "No loan selected"}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </Card>
+
+        <Card title="Status board" description="Shared state reflected in the host shell.">
+          <div className="grid gap-4">
+            <div className="rounded-xl bg-slate-50 p-4">
+              <p className="text-xs uppercase tracking-[0.16em] text-slate-500">Liveness</p>
+              <p className="mt-2 text-sm font-semibold text-slate-900">
+                {onboardingProgress.livenessVerified ? "Verified" : "Pending"}
+              </p>
+            </div>
+            <div className="rounded-xl bg-slate-50 p-4">
+              <p className="text-xs uppercase tracking-[0.16em] text-slate-500">Loan amount</p>
+              <p className="mt-2 text-sm font-semibold text-slate-900">
+                {loanApplication.loanAmount || "Not provided"}
+              </p>
+            </div>
+            <div className="rounded-xl bg-slate-50 p-4">
+              <p className="text-xs uppercase tracking-[0.16em] text-slate-500">Contact</p>
+              <p className="mt-2 text-sm font-semibold text-slate-900">
+                {userProfile.email || "No email captured"}
+              </p>
+            </div>
+          </div>
+        </Card>
+      </section>
+
+      <section className="grid gap-6 md:grid-cols-2">
+        <Card title="Onboarding readiness" description="Documents and verification progress">
+          <ul className="space-y-3 text-sm text-slate-600">
+            <li>NID front: {onboardingProgress.nidFrontName || "Missing"}</li>
+            <li>NID back: {onboardingProgress.nidBackName || "Missing"}</li>
+            <li>Liveness image: {onboardingProgress.livenessImage ? "Captured" : "Not captured"}</li>
+          </ul>
+        </Card>
+        <Card title="Loan readiness" description="Current loan application details">
+          <ul className="space-y-3 text-sm text-slate-600">
+            <li>Selected product: {loanApplication.selectedLoan?.name || "None"}</li>
+            <li>Tenure: {loanApplication.loanTenure || "Not provided"}</li>
+            <li>Submission status: {loanApplication.submitted ? "Submitted" : "Draft"}</li>
+          </ul>
+        </Card>
+      </section>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <div className="min-h-screen bg-gray-100 font-body text-slate-900">
+      <div className="mx-auto max-w-7xl px-4 py-6 md:px-6">
+        <header className="mb-8 flex flex-col gap-4 rounded-[28px] bg-white px-6 py-5 shadow-card md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">
+              BRAC Bank
+            </p>
+            <h1 className="font-display text-2xl font-semibold">React micro-frontend workspace</h1>
+          </div>
+          <nav className="flex flex-wrap gap-3 text-sm font-medium">
+            {[
+              ["/", "Dashboard"],
+              ["/onboarding", "Onboarding"],
+              ["/loan", "Loan"]
+            ].map(([to, label]) => (
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) =>
+                  `rounded-xl px-4 py-2 ${isActive ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700"}`
+                }
+                end={to === "/"}
+              >
+                {label}
+              </NavLink>
+            ))}
+          </nav>
+        </header>
+
+        <Suspense fallback={<Loader label="Loading micro-frontend..." />}>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/loan" element={<LoanApp />} />
+            <Route path="/onboarding" element={<OnboardingApp />} />
+          </Routes>
+        </Suspense>
+      </div>
+    </div>
+  );
+}
