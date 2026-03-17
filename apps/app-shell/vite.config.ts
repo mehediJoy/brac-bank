@@ -7,8 +7,7 @@ const shared = {
   "react-dom": { singleton: true },
   "react-router-dom": { singleton: true },
   zustand: { singleton: true },
-  "@banking/store": { singleton: true },
-  "@banking/ui": { singleton: true }
+  "@banking/store": { singleton: true }
 } as any;
 
 export default defineConfig({
