@@ -26,8 +26,8 @@ function Dashboard() {
 
   const contactLabel = userProfile.email || userProfile.phone || "No contact captured";
 
-  const onboardingNidFrontLabel = onboardingProgress.nidFrontName || "Missing";
-  const onboardingNidBackLabel = onboardingProgress.nidBackName || "Missing";
+  const onboardingStepLabel = `Step ${onboardingProgress.step}/4`;
+  const onboardingSubmissionStatusLabel = onboardingProgress.submitted ? "Submitted" : "In progress";
   const onboardingLivenessImageLabel = onboardingProgress.livenessImage
     ? `Captured (${onboardingProgress.livenessStatus})`
     : "Not captured";
@@ -118,8 +118,8 @@ function Dashboard() {
           className="rounded-md"
         >
           <ul className="space-y-3 text-sm text-slate-600">
-            <li>NID front: {onboardingNidFrontLabel}</li>
-            <li>NID back: {onboardingNidBackLabel}</li>
+            <li>Current step: {onboardingStepLabel}</li>
+            <li>Submission status: {onboardingSubmissionStatusLabel}</li>
             <li>Liveness image: {onboardingLivenessImageLabel}</li>
           </ul>
         </Card>
@@ -195,8 +195,47 @@ export default function App() {
           </Routes>
         </Suspense>
 
-        <footer className="mt-10 pb-3">
-          <p className="text-left text-xs font-medium text-slate-600">© 2026 Copyright By BRAC Bank PLC</p>
+        <footer className="mt-10 rounded-2xl bg-white px-5 py-6 shadow-card md:px-6 md:py-7">
+          <div className="grid gap-8 lg:grid-cols-[1.25fr_0.9fr_0.9fr_0.95fr]">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <img src={bracBankLogo} alt="BRAC Bank" className="h-5 w-auto" />
+              </div>
+              <div className="space-y-2 text-sm leading-6 text-slate-600">
+                <p className="text-base font-semibold text-slate-900">Address</p>
+                <p>BRAC Bank PLC, Anik Tower, 220/B, Tejgaon-Gulshan Link Road, Tejgaon, Dhaka-1208</p>
+                <p>
+                  24/7 Call Center <span className="font-semibold text-slate-900">16221</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2 text-sm text-slate-600 lg:pt-10">
+              <a href="#" className="block hover:text-[rgb(2,103,223)]">Contact Us</a>
+              <a href="#" className="block hover:text-[rgb(2,103,223)]">Career</a>
+              <a href="#" className="block hover:text-[rgb(2,103,223)]">Financial Literacy</a>
+              <a href="#" className="block hover:text-[rgb(2,103,223)]">CSR</a>
+              <a href="#" className="block hover:text-[rgb(2,103,223)]">Citizen Charter</a>
+            </div>
+
+            <div className="space-y-2 text-sm text-slate-600 lg:pt-10">
+              <a href="#" className="block hover:text-[rgb(2,103,223)]">About Us</a>
+              <a href="#" className="block hover:text-[rgb(2,103,223)]">Investor Relations</a>
+              <a href="#" className="block hover:text-[rgb(2,103,223)]">Forex Rates</a>
+              <a href="#" className="block hover:text-[rgb(2,103,223)]">Risk Based Capital</a>
+            </div>
+
+            <div className="space-y-2 text-sm text-slate-600 lg:pt-10">
+              <a href="#" className="block hover:text-[rgb(2,103,223)]">Credit Rating</a>
+              <a href="#" className="block hover:text-[rgb(2,103,223)]">Media</a>
+              <a href="#" className="block hover:text-[rgb(2,103,223)]">E-Tender</a>
+              <p>SWIFT: BRAKBDDH</p>
+            </div>
+          </div>
+
+          <div className="mt-8 border-t border-slate-200 pt-4">
+            <p className="text-left text-sm font-medium text-[#002a5c]">© 2026 Copyright By BRAC Bank PLC</p>
+          </div>
         </footer>
       </div>
     </div>
