@@ -4,6 +4,13 @@ import { useBankingStore } from "@banking/store";
 
 const steps = ["Personal info", "Address info", "Income info", "Review"];
 const remoteCssKey = "css__onboarding-mfe__./App";
+const monthlyIncomeOptions = [
+  "Below BDT 25,000",
+  "BDT 25,000 - 50,000",
+  "BDT 50,001 - 100,000",
+  "BDT 100,001 - 200,000",
+  "Above BDT 200,000"
+];
 
 function readImageMetadata(file: File): Promise<{
   preview: string;
@@ -407,12 +414,24 @@ export default function App() {
               onChange={(event) => updateUserProfile({ occupation: event.target.value })}
               error={errors.occupation}
             />
-            <Input
-              label="Monthly Income"
-              value={userProfile.monthlyIncome}
-              onChange={(event) => updateUserProfile({ monthlyIncome: event.target.value })}
-              error={errors.monthlyIncome}
-            />
+            <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
+              <span>Monthly Income</span>
+              <select
+                value={userProfile.monthlyIncome}
+                onChange={(event) => updateUserProfile({ monthlyIncome: event.target.value })}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+              >
+                <option value="">Select monthly income</option>
+                {monthlyIncomeOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              {errors.monthlyIncome ? (
+                <span className="text-xs text-red-500">{errors.monthlyIncome}</span>
+              ) : null}
+            </label>
             <Input
               label="Company Name"
               value={userProfile.companyName}
