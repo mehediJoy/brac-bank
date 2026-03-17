@@ -1,7 +1,15 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import federation from "@originjs/vite-plugin-federation";
-import { fileURLToPath, URL } from "node:url";
+
+const shared = {
+  react: { singleton: true },
+  "react-dom": { singleton: true },
+  "react-router-dom": { singleton: true },
+  zustand: { singleton: true },
+  "@banking/store": { singleton: true },
+  "@banking/ui": { singleton: true }
+} as any;
 
 export default defineConfig({
   plugins: [
@@ -12,20 +20,22 @@ export default defineConfig({
         "loan-mfe": "http://localhost:3001/assets/remoteEntry.js",
         "onboarding-mfe": "http://localhost:3002/assets/remoteEntry.js"
       },
-      shared: ["react", "react-dom", "zustand"]
+      shared
     })
   ],
   server: {
     port: 3000,
+    strictPort: true,
+    cors: true
+  },
+  preview: {
+    port: 3000,
     strictPort: true
   },
-  resolve: {
-    alias: {
-      "@banking/ui": fileURLToPath(new URL("../../packages/ui-library/src", import.meta.url)),
-      "@banking/store": fileURLToPath(new URL("../../packages/store/src", import.meta.url))
-    }
-  },
   build: {
-    target: "esnext"
+    target: "esnext",
+    modulePreload: false,
+    cssCodeSplit: false,
+    minify: false
   }
 });
