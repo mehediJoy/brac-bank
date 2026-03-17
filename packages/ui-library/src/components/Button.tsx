@@ -8,10 +8,10 @@ type ButtonProps = PropsWithChildren<
 >;
 
 const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
-  primary: "bg-blue-600 text-white hover:bg-blue-700",
-  secondary: "bg-slate-900 text-white hover:bg-slate-800",
+  primary: "bg-[rgb(2,103,223)] text-white hover:bg-[rgb(1,92,199)]",
+  secondary: "bg-[rgb(2,103,223)] text-white hover:bg-[rgb(1,92,199)]",
   ghost: "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50",
-  success: "bg-green-500 text-white hover:bg-green-600"
+  success: "bg-[rgb(2,103,223)] text-white hover:bg-[rgb(1,92,199)]"
 };
 
 export function Button({

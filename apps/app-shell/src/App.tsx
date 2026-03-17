@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import { Link, NavLink, Route, Routes } from "react-router-dom";
 import { Card, Loader } from "@banking/ui";
 import { useBankingStore } from "@banking/store";
+import bracBankLogo from "../logo.svg";
 
 const LoanApp = React.lazy(() => import("loan-mfe/App"));
 const OnboardingApp = React.lazy(() => import("onboarding-mfe/App"));
@@ -41,18 +42,18 @@ function Dashboard() {
         <Card
           title="Banking journeys in one workspace"
           description="Start onboarding, apply for a loan, and track progress from the host shell."
-          className="overflow-hidden bg-slate-950 text-white"
+          className="overflow-hidden rounded-md bg-slate-950 text-white"
         >
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-4">
-              <p className="max-w-md text-sm text-slate-300">
-                This shell lazy-loads both micro-frontends and keeps applicant data centralized
-                through a shared Zustand store.
+              <p className="max-w-md text-sm text-slate-600">
+                This platform helps customers complete digital onboarding, submit loan requests,
+                and monitor application progress from a single unified banking portal.
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link
                   to="/onboarding"
-                  className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white"
+                  className="rounded-xl bg-[rgb(2,103,223)] px-4 py-3 text-sm font-semibold text-white"
                 >
                   Start onboarding
                 </Link>
@@ -88,7 +89,11 @@ function Dashboard() {
           </div>
         </Card>
 
-        <Card title="Status board" description="Shared state reflected in the host shell.">
+        <Card
+          title="Status board"
+          description="Shared state reflected in the host shell."
+          className="rounded-md"
+        >
           <div className="grid gap-4">
             <div className="rounded-xl bg-slate-50 p-4">
               <p className="text-xs uppercase tracking-[0.16em] text-slate-500">Liveness</p>
@@ -107,14 +112,22 @@ function Dashboard() {
       </section>
 
       <section className="grid gap-6 md:grid-cols-2">
-        <Card title="Onboarding readiness" description="Documents and verification progress">
+        <Card
+          title="Onboarding readiness"
+          description="Documents and verification progress"
+          className="rounded-md"
+        >
           <ul className="space-y-3 text-sm text-slate-600">
             <li>NID front: {onboardingNidFrontLabel}</li>
             <li>NID back: {onboardingNidBackLabel}</li>
             <li>Liveness image: {onboardingLivenessImageLabel}</li>
           </ul>
         </Card>
-        <Card title="Loan readiness" description="Current loan application details">
+        <Card
+          title="Loan readiness"
+          description="Current loan application details"
+          className="rounded-md"
+        >
           <ul className="space-y-3 text-sm text-slate-600">
             <li>Selected product: {loanSelectedProductLabel}</li>
             <li>Tenure: {loanTenureLabel}</li>
@@ -134,9 +147,7 @@ export default function App() {
       <div className="mx-auto max-w-7xl px-4 py-6 md:px-6">
         <header className="mb-8 flex flex-col gap-4 rounded-[28px] bg-white px-6 py-5 shadow-card md:!flex-row md:!items-center md:!justify-between">
           <div className="flex w-full md:w-auto items-center justify-between pointer-events-auto">
-            <p className="text-base font-bold uppercase tracking-[0.22em] text-blue-600 md:text-lg">
-              BRAC Bank
-            </p>
+            <img src={bracBankLogo} alt="BRAC Bank" className="h-4 w-auto md:h-5" />
             <button
               className="md:hidden rounded-lg p-2 text-slate-600 hover:bg-slate-100"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -163,7 +174,9 @@ export default function App() {
                 onClick={() => setIsMenuOpen(false)}
                 className={({ isActive }) =>
                   `rounded-xl px-4 py-2 text-center ${
-                    isActive ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    isActive
+                      ? "bg-[rgb(2,103,223)] text-white"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                   }`
                 }
                 end={to === "/"}
@@ -181,6 +194,10 @@ export default function App() {
             <Route path="/onboarding" element={<OnboardingApp />} />
           </Routes>
         </Suspense>
+
+        <footer className="mt-10 pb-3">
+          <p className="text-left text-xs font-medium text-slate-600">© 2026 Copyright By BRAC Bank PLC</p>
+        </footer>
       </div>
     </div>
   );
