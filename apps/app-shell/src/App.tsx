@@ -9,6 +9,32 @@ const OnboardingApp = React.lazy(() => import("onboarding-mfe/App"));
 function Dashboard() {
   const { userProfile, onboardingProgress, loanApplication } = useBankingStore();
 
+  const livenessStatusLabel = onboardingProgress.livenessVerified
+    ? "Verified"
+    : onboardingProgress.livenessStatus === "verifying"
+      ? "Verifying"
+      : onboardingProgress.livenessStatus === "captured"
+        ? "Captured"
+        : "Pending";
+
+  const loanAmountLabel = loanApplication.loanAmount
+    ? loanApplication.loanAmount
+    : loanApplication.selectedLoan
+      ? `Up to ${loanApplication.selectedLoan.maximumAmount}`
+      : "Not provided";
+
+  const contactLabel = userProfile.email || userProfile.phone || "No contact captured";
+
+  const onboardingNidFrontLabel = onboardingProgress.nidFrontName || "Missing";
+  const onboardingNidBackLabel = onboardingProgress.nidBackName || "Missing";
+  const onboardingLivenessImageLabel = onboardingProgress.livenessImage
+    ? `Captured (${onboardingProgress.livenessStatus})`
+    : "Not captured";
+
+  const loanSelectedProductLabel = loanApplication.selectedLoan?.name || "None";
+  const loanTenureLabel = loanApplication.loanTenure || "Not provided";
+  const loanSubmissionStatusLabel = loanApplication.submitted ? "Submitted" : "Draft";
+
   return (
     <div className="space-y-6">
       <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
@@ -66,21 +92,15 @@ function Dashboard() {
           <div className="grid gap-4">
             <div className="rounded-xl bg-slate-50 p-4">
               <p className="text-xs uppercase tracking-[0.16em] text-slate-500">Liveness</p>
-              <p className="mt-2 text-sm font-semibold text-slate-900">
-                {onboardingProgress.livenessVerified ? "Verified" : "Pending"}
-              </p>
+              <p className="mt-2 text-sm font-semibold text-slate-900">{livenessStatusLabel}</p>
             </div>
             <div className="rounded-xl bg-slate-50 p-4">
               <p className="text-xs uppercase tracking-[0.16em] text-slate-500">Loan amount</p>
-              <p className="mt-2 text-sm font-semibold text-slate-900">
-                {loanApplication.loanAmount || "Not provided"}
-              </p>
+              <p className="mt-2 text-sm font-semibold text-slate-900">{loanAmountLabel}</p>
             </div>
             <div className="rounded-xl bg-slate-50 p-4">
               <p className="text-xs uppercase tracking-[0.16em] text-slate-500">Contact</p>
-              <p className="mt-2 text-sm font-semibold text-slate-900">
-                {userProfile.email || "No email captured"}
-              </p>
+              <p className="mt-2 text-sm font-semibold text-slate-900">{contactLabel}</p>
             </div>
           </div>
         </Card>
@@ -89,16 +109,16 @@ function Dashboard() {
       <section className="grid gap-6 md:grid-cols-2">
         <Card title="Onboarding readiness" description="Documents and verification progress">
           <ul className="space-y-3 text-sm text-slate-600">
-            <li>NID front: {onboardingProgress.nidFrontName || "Missing"}</li>
-            <li>NID back: {onboardingProgress.nidBackName || "Missing"}</li>
-            <li>Liveness image: {onboardingProgress.livenessImage ? "Captured" : "Not captured"}</li>
+            <li>NID front: {onboardingNidFrontLabel}</li>
+            <li>NID back: {onboardingNidBackLabel}</li>
+            <li>Liveness image: {onboardingLivenessImageLabel}</li>
           </ul>
         </Card>
         <Card title="Loan readiness" description="Current loan application details">
           <ul className="space-y-3 text-sm text-slate-600">
-            <li>Selected product: {loanApplication.selectedLoan?.name || "None"}</li>
-            <li>Tenure: {loanApplication.loanTenure || "Not provided"}</li>
-            <li>Submission status: {loanApplication.submitted ? "Submitted" : "Draft"}</li>
+            <li>Selected product: {loanSelectedProductLabel}</li>
+            <li>Tenure: {loanTenureLabel}</li>
+            <li>Submission status: {loanSubmissionStatusLabel}</li>
           </ul>
         </Card>
       </section>
