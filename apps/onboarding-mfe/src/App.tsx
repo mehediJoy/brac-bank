@@ -67,6 +67,13 @@ export default function App() {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isSupported, setIsSupported] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const verificationTimerRef = useRef<number | null>(null);
+
+  const formatPhoneValue = (rawValue: string) => {
+    const digitsOnly = rawValue.replace(/\D/g, "");
+    const localDigits = digitsOnly.startsWith("880") ? digitsOnly.slice(3) : digitsOnly;
+    return `+880${localDigits}`;
+  };
 
   useEffect(() => {
     let active = true;
@@ -105,14 +112,27 @@ export default function App() {
     }
   }, [stream]);
 
+  useEffect(() => {
+    return () => {
+      if (verificationTimerRef.current) {
+        window.clearTimeout(verificationTimerRef.current);
+      }
+    };
+  }, []);
+
   const validateStep = () => {
     const nextErrors: Record<string, string> = {};
 
     if (onboardingProgress.step === 1) {
       if (!userProfile.fullName.trim()) nextErrors.fullName = "Full name is required";
       if (!userProfile.dateOfBirth.trim()) nextErrors.dateOfBirth = "Date of birth is required";
-      if (!userProfile.phone.trim()) nextErrors.phone = "Phone is required";
+      if (userProfile.phone.replace(/\D/g, "").length <= 3) nextErrors.phone = "Phone is required";
       if (!userProfile.email.trim()) nextErrors.email = "Email is required";
+      if (!onboardingProgress.nidFrontName.trim()) nextErrors.nidFront = "NID front is required";
+      if (!onboardingProgress.nidBackName.trim()) nextErrors.nidBack = "NID back is required";
+      if (!onboardingProgress.livenessVerified) {
+        nextErrors.liveness = "Complete liveness verification before continuing";
+      }
     }
 
     if (onboardingProgress.step === 2) {
@@ -159,13 +179,33 @@ export default function App() {
   };
 
   const verifyLiveness = () => {
+    if (verificationTimerRef.current) {
+      window.clearTimeout(verificationTimerRef.current);
+      verificationTimerRef.current = null;
+    }
+
     updateOnboardingProgress({ livenessStatus: "verifying" });
-    window.setTimeout(() => {
+
+    verificationTimerRef.current = window.setTimeout(() => {
       updateOnboardingProgress({
         livenessStatus: "verified",
         livenessVerified: true
       });
+      verificationTimerRef.current = null;
     }, 2200);
+  };
+
+  const reverifyLiveness = () => {
+    if (verificationTimerRef.current) {
+      window.clearTimeout(verificationTimerRef.current);
+      verificationTimerRef.current = null;
+    }
+
+    updateOnboardingProgress({
+      livenessImage: null,
+      livenessStatus: "idle",
+      livenessVerified: false
+    });
   };
 
   return (
@@ -204,7 +244,8 @@ export default function App() {
             <Input
               label="Phone"
               value={userProfile.phone}
-              onChange={(event) => updateUserProfile({ phone: event.target.value })}
+              onChange={(event) => updateUserProfile({ phone: formatPhoneValue(event.target.value) })}
+              inputMode="numeric"
               error={errors.phone}
             />
             <Input
@@ -243,6 +284,7 @@ export default function App() {
                   });
                 }}
               />
+              {errors.nidFront ? <p className="text-xs text-red-500">{errors.nidFront}</p> : null}
               <FileUploader
                 label="NID Back"
                 helperText="Upload the back side of the NID."
@@ -268,6 +310,7 @@ export default function App() {
                   });
                 }}
               />
+              {errors.nidBack ? <p className="text-xs text-red-500">{errors.nidBack}</p> : null}
             </div>
 
             <div className="space-y-4">
@@ -299,7 +342,13 @@ export default function App() {
                       : "Verify liveness"}
                   </Button>
                 ) : null}
+                {onboardingProgress.livenessImage ? (
+                  <Button type="button" variant="ghost" onClick={reverifyLiveness}>
+                    Reverify
+                  </Button>
+                ) : null}
               </div>
+              {errors.liveness ? <p className="text-xs text-red-500">{errors.liveness}</p> : null}
             </div>
           </div>
 
@@ -382,31 +431,40 @@ export default function App() {
 
       {onboardingProgress.step === 4 ? (
         <Card title="Review & submit" description="Confirm all entered information before submission.">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-3">
             <div className="rounded-xl bg-slate-50 p-4">
-              <h3 className="text-sm font-semibold text-slate-900">Profile</h3>
+              <h3 className="text-sm font-semibold text-slate-900">Personal details</h3>
               <ul className="mt-3 space-y-2 text-sm text-slate-700">
-                <li>Name: {userProfile.fullName}</li>
-                <li>Date of birth: {userProfile.dateOfBirth}</li>
-                <li>Phone: {userProfile.phone}</li>
-                <li>Email: {userProfile.email}</li>
-                <li>Address: {userProfile.presentAddress}</li>
-                <li>City: {userProfile.city}</li>
-                <li>District: {userProfile.district}</li>
-                <li>Postal code: {userProfile.postalCode}</li>
-                <li>Occupation: {userProfile.occupation}</li>
-                <li>Monthly income: {userProfile.monthlyIncome}</li>
-                <li>Company: {userProfile.companyName}</li>
+                <li>Full name: {userProfile.fullName || "Not provided"}</li>
+                <li>Date of birth: {userProfile.dateOfBirth || "Not provided"}</li>
+                <li>Phone: {userProfile.phone || "Not provided"}</li>
+                <li>Email: {userProfile.email || "Not provided"}</li>
               </ul>
             </div>
             <div className="rounded-xl bg-slate-50 p-4">
-              <h3 className="text-sm font-semibold text-slate-900">Verification</h3>
+              <h3 className="text-sm font-semibold text-slate-900">Address and income</h3>
+              <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                <li>Present address: {userProfile.presentAddress || "Not provided"}</li>
+                <li>City: {userProfile.city || "Not provided"}</li>
+                <li>District: {userProfile.district || "Not provided"}</li>
+                <li>Postal code: {userProfile.postalCode || "Not provided"}</li>
+                <li>Occupation: {userProfile.occupation || "Not provided"}</li>
+                <li>Monthly income: {userProfile.monthlyIncome || "Not provided"}</li>
+                <li>Company: {userProfile.companyName || "Not provided"}</li>
+              </ul>
+            </div>
+            <div className="rounded-xl bg-slate-50 p-4">
+              <h3 className="text-sm font-semibold text-slate-900">Verification summary</h3>
               <ul className="mt-3 space-y-2 text-sm text-slate-700">
                 <li>NID front: {onboardingProgress.nidFrontName || "Missing"}</li>
                 <li>NID back: {onboardingProgress.nidBackName || "Missing"}</li>
                 <li>
                   Liveness status:{" "}
-                  {onboardingProgress.livenessVerified ? "Verified" : onboardingProgress.livenessStatus}
+                  {onboardingProgress.livenessVerified
+                    ? "Verified"
+                    : onboardingProgress.livenessStatus === "idle"
+                      ? "Not started"
+                      : onboardingProgress.livenessStatus}
                 </li>
               </ul>
               {onboardingProgress.livenessImage ? (

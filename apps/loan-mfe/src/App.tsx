@@ -41,13 +41,29 @@ export default function App() {
 
   const selectedLoan = loanApplication.selectedLoan;
   const loanProducts = useMemo(() => products as LoanProduct[], []);
+  const tenureOptions = ["12 months", "24 months", "36 months", "48 months", "60 months"];
+
+  const formatPhoneValue = (rawValue: string) => {
+    const digitsOnly = rawValue.replace(/\D/g, "");
+    const localDigits = digitsOnly.startsWith("880") ? digitsOnly.slice(3) : digitsOnly;
+    return `+880${localDigits}`;
+  };
+
+  const amountOptions = useMemo(() => {
+    if (!selectedLoan) return [] as string[];
+    return [0.25, 0.5, 0.75, 1].map((ratio) =>
+      money.format(Math.round(selectedLoan.maximumAmount * ratio))
+    );
+  }, [selectedLoan]);
 
   const validateApplicant = () => {
     const nextErrors: Record<string, string> = {};
     if (!userProfile.fullName.trim()) nextErrors.fullName = "Full name is required";
-    if (!userProfile.phone.trim()) nextErrors.phone = "Phone is required";
+    if (userProfile.phone.replace(/\D/g, "").length <= 3) nextErrors.phone = "Phone is required";
     if (!userProfile.email.trim()) nextErrors.email = "Email is required";
     if (!userProfile.monthlyIncome.trim()) nextErrors.monthlyIncome = "Monthly income is required";
+    if (!loanApplication.loanAmount.trim()) nextErrors.loanAmount = "Loan amount is required";
+    if (!loanApplication.loanTenure.trim()) nextErrors.loanTenure = "Loan tenure is required";
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
@@ -113,7 +129,8 @@ export default function App() {
             <Input
               label="Phone"
               value={userProfile.phone}
-              onChange={(event) => updateUserProfile({ phone: event.target.value })}
+              onChange={(event) => updateUserProfile({ phone: formatPhoneValue(event.target.value) })}
+              inputMode="numeric"
               error={errors.phone}
             />
             <Input
@@ -129,17 +146,38 @@ export default function App() {
               onChange={(event) => updateUserProfile({ monthlyIncome: event.target.value })}
               error={errors.monthlyIncome}
             />
-            <Input
-              label="Loan Amount"
-              value={loanApplication.loanAmount}
-              onChange={(event) => updateLoanApplication({ loanAmount: event.target.value })}
-            />
-            <Input
-              label="Loan Tenure"
-              placeholder="e.g. 36 months"
-              value={loanApplication.loanTenure}
-              onChange={(event) => updateLoanApplication({ loanTenure: event.target.value })}
-            />
+            <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
+              <span>Loan Amount</span>
+              <select
+                value={loanApplication.loanAmount}
+                onChange={(event) => updateLoanApplication({ loanAmount: event.target.value })}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+              >
+                <option value="">Select loan amount</option>
+                {amountOptions.map((amount) => (
+                  <option key={amount} value={amount}>
+                    {amount}
+                  </option>
+                ))}
+              </select>
+              {errors.loanAmount ? <span className="text-xs text-red-500">{errors.loanAmount}</span> : null}
+            </label>
+            <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
+              <span>Loan Tenure</span>
+              <select
+                value={loanApplication.loanTenure}
+                onChange={(event) => updateLoanApplication({ loanTenure: event.target.value })}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+              >
+                <option value="">Select loan tenure</option>
+                {tenureOptions.map((tenure) => (
+                  <option key={tenure} value={tenure}>
+                    {tenure}
+                  </option>
+                ))}
+              </select>
+              {errors.loanTenure ? <span className="text-xs text-red-500">{errors.loanTenure}</span> : null}
+            </label>
           </div>
           <div className="mt-6 flex justify-end">
             <Button

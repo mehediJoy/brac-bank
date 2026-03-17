@@ -66,7 +66,7 @@ type BankingStore = {
 const initialUserProfile: UserProfile = {
   fullName: "",
   dateOfBirth: "",
-  phone: "",
+  phone: "+880",
   email: "",
   presentAddress: "",
   city: "",

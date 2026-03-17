@@ -44,7 +44,7 @@ function Dashboard() {
           description="Start onboarding, apply for a loan, and track progress from the host shell."
           className="overflow-hidden rounded-md bg-slate-950 text-white"
         >
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6">
             <div className="space-y-4">
               <p className="max-w-md text-sm text-slate-600">
                 This platform helps customers complete digital onboarding, submit loan requests,
@@ -64,27 +64,6 @@ function Dashboard() {
                   Explore loans
                 </Link>
               </div>
-            </div>
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-              <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Applicant snapshot</p>
-              <dl className="mt-4 grid gap-3 text-sm">
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-400">Name</dt>
-                  <dd className="font-medium">{userProfile.fullName || "Not started"}</dd>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-400">Onboarding</dt>
-                  <dd className="font-medium">
-                    {onboardingProgress.submitted ? "Submitted" : `Step ${onboardingProgress.step}/4`}
-                  </dd>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-400">Loan</dt>
-                  <dd className="font-medium">
-                    {loanApplication.selectedLoan?.name || "No loan selected"}
-                  </dd>
-                </div>
-              </dl>
             </div>
           </div>
         </Card>
