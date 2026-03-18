@@ -64,3 +64,11 @@ pnpm build
 - Loan products are loaded from a local JSON file to mimic an API response.
 - Shared state is kept in memory for local development.
 - Camera access depends on the browser and device permissions.
+
+## Preview
+
+![Preview 1](./docs/previews/1.png)
+![Preview 2](./docs/previews/2.png)
+![Preview 3](./docs/previews/3.png)
+![Preview 4](./docs/previews/4.png)
+![Preview 5](./docs/previews/5.png)
