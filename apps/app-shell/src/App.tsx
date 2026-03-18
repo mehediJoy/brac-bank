@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import { Link, NavLink, Route, Routes } from "react-router-dom";
 import { Card, Loader } from "@banking/ui";
 import { useBankingStore } from "@banking/store";
-import bracBankLogo from "../logo.svg";
+import bracBankLogo from "./assets/logo.svg";
 
 const LoanApp = React.lazy(() => import("loan-mfe/App"));
 const OnboardingApp = React.lazy(() => import("onboarding-mfe/App"));

@@ -1,5 +1,7 @@
 # React Banking Micro-Frontend
 
+![BRAC Bank Logo](./apps/app-shell/src/assets/logo.svg)
+
 A `pnpm` monorepo implementing a banking micro-frontend assignment with:
 
 - `app-shell` host on `http://localhost:3000`
